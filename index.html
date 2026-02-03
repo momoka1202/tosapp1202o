@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>世界の動物園ライブ地図</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 500px; width: 100%; margin-top: 20px; }
+    iframe { width: 560px; height: 315px; margin-top: 10px; display: block; }
+  </style>
+</head>
+<body>
+  <h1>🌍 世界の動物園ライブ地図 🌍</h1>
+
+  <label>カテゴリー選択：</label>
+  <select id="category" onchange="filterMarkers()">
+    <option value="">-- 選択してください --</option>
+    <option value="mammal">哺乳類</option>
+    <option value="bird">鳥類</option>
+    <option value="reptile">爬虫類</option>
+  </select>
+
+  <div id="map"></div>
+
+  <iframe id="video" src="" frameborder="0" allowfullscreen></iframe>
+  <p id="info"></p>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const animalData = [
+      { name: "パンダ", category: "mammal", lat: 35.7167, lng: 139.774, video: "https://www.youtube.com/embed/0V1V9YxG5KQ", info: "パンダは1日の約10〜16時間を竹を食べます。" },
+      { name: "ライオン", category: "mammal", lat: 32.735, lng: -117.149, video: "https://www.youtube.com/embed/1La4QzGeaaQ", info: "ライオンは夜行性です。" },
+      { name: "ペンギン", category: "bird", lat: 55.954, lng: -3.174, video: "https://www.youtube.com/embed/5qap5aO4i9A", info: "ペンギンは水中で速く泳げます。" },
+      { name: "フラミンゴ", category: "bird", lat: 40.767, lng: -73.971, video: "https://www.youtube.com/embed/dQw4w9WgXcQ", info: "フラミンゴは赤色の体を持ちます。" },
+      { name: "カメ", category: "reptile", lat: 25.7617, lng: -80.1918, video: "https://www.youtube.com/embed/dQw4w9WgXcQ", info: "カメは長寿で知られています。" }
+    ];
+
+    // 地図作成
+    const map = L.map('map').setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let markers = [];
+
+    function addMarkers(data) {
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      data.forEach(animal => {
+        const marker = L.marker([animal.lat, animal.lng]).addTo(map);
+        marker.bindPopup(animal.name);
+        marker.on('click', () => {
+          document.getElementById("video").src = animal.video;
+          document.getElementById("info").textContent = animal.info;
+        });
+        markers.push(marker);
+      });
+    }
+
+    function filterMarkers() {
+      const category = document.getElementById("category").value;
+      if (category === "") {
+        addMarkers(animalData);
+      } else {
+        const filtered = animalData.filter(a => a.category === category);
+        addMarkers(filtered);
+      }
+    }
+
+    // 初期表示
+    addMarkers(animalData);
+  </script>
+</body>
+</html>
